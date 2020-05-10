@@ -31,8 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var modals = document.querySelectorAll('.modal');
   var modalOptions = {
-    opacity: 0,
-    preventScrolling: false
+
 }
   M.Modal.init(modals,modalOptions);
 
@@ -51,7 +50,9 @@ class App extends React.Component {
     user: {
       id: 'placeholder'
     },
-    userLoggedIn: false
+    userLoggedIn: false,
+    DBholdings: null,
+    holdings: null
   }
 
   
@@ -100,11 +101,14 @@ class App extends React.Component {
   }
 
 
-
+parseHoldings = () => {
+  var DBholdings = this.state.DBholdings.docs;
+  DBholdings.forEach(holdingDoc => {
+    console.log(holdingDoc.data())
+  })
+}
  
   componentDidMount() {
-
-
 
     db.collection('games').doc('VkKYxxa3IFsqpo30lXal').onSnapshot(game => {
         this.setState({
@@ -123,12 +127,19 @@ class App extends React.Component {
             userLoggedIn: true
           });
         });
+        db.collection('holdings').onSnapshot(holdings => {
+          this.setState({
+            DBholdings: holdings
+          }, () => {
+            this.parseHoldings();
+        });
+        })
       }else{
         this.setState({
-          user: {
-            id: 'placeholder'
-          },
-          userLoggedIn: false
+          user: null,
+          userLoggedIn: false,
+          DBholdings: null,
+          holdings: null
         })
       }
     });
@@ -194,17 +205,17 @@ class App extends React.Component {
   render(){
     var holding = {
       price: 100,
-      priceBought: 90,
-      quantity: 10,
+      priceBought: 0,
+      quantity: 0,
       key: 'W',
       name: 'Wayfair',
       previousClose: 99,
       percentChange: 1,
       changeType: 'percentChangeUp'
     }
-
     var whoseTurn = this.whoseTurn();
     var cardClass = this.currentUsersTurn() ? 'card active' : 'card inactive'
+
     return (
       <div className="App">
         <Nav user={this.state.user} userLoggedIn={this.state.userLoggedIn} loginSubmit={this.logIn} signUpSubmit={this.signUp} logOut={this.logOut} ></Nav>
