@@ -4,7 +4,7 @@ import M from 'materialize-css';
 import "firebase/auth";
 import "firebase/firestore";
 import * as firebase from "firebase/app";
-import Card from './Card';
+import Deck from './Deck';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDzqyPJQMMgg0TW6A8Zjgq01EkkcUF_x7E",
@@ -22,8 +22,88 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+//Reset game
+//  var gameID = 'VkKYxxa3IFsqpo30lXal'
+//  var game = db.collection('games').doc(gameID);
 
+// db.collection('securities').get().then(securities => {
+//   securities.docs.forEach(security => {
+//     db.collection("securities").doc(security.id).delete()
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Tech',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 1
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Healthcare',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 2
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Real Estate',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 3
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Oil',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 4
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Financial',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 5
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Consumer Goods',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 6
+//   })
+//   db.collection('securities').add({
+//     TypeName: 'Bond',
+//     game: game,
+//     price: 100,
+//     previousClose: 100,
+//     type: 7
+//   })
+// })
 
+// db.collection('holdings').where('game','==',game).get().then(holdings => {
+//   holdings.forEach(holding => {
+//     db.collection('holdings').doc(holding.id).delete()
+//   })
+// })
+
+// db.collection('users').get().then(users => {
+//   db.collection('securities').where('game','==',game).get().then(securities => {
+//       users.docs.forEach(user => {
+//         var owner = db.collection('users').doc(user.id);
+//         securities.docs.forEach(security => {
+//           var thing = db.collection('securities').doc(security.id)
+//           db.collection('holdings').add({
+//             owner: owner,
+//             game: game,
+//             price: 100,
+//             quantity: 0,
+//             security: thing
+//           })
+//         })
+//       })
+//   })
+// })
 
 
 // setup materialize components
@@ -47,44 +127,21 @@ document.addEventListener('DOMContentLoaded', function() {
 class App extends React.Component {
   
   state = {
-    user: {
-      id: 'placeholder'
-    },
+    user: null,
     userLoggedIn: false,
     DBholdings: null,
-    holdings: null
+    holdings: null,
+    DBsecurities: null,
+    securities: null
   }
 
   
-
-  signUp = (e) => {
-    e.preventDefault();
-    const signupForm = document.querySelector('#signup-form');
-    const email = signupForm['signup-email'].value;
-    const password = signupForm['signup-password'].value;
-    const name = signupForm['signup-name'].value;
-    document.getElementById("signup-form").reset();
-
-    const modal = document.querySelector('#modal-signup');
-    M.Modal.getInstance(modal).close();
-    signupForm.reset();
-
-    auth.createUserWithEmailAndPassword(email,password).then(cred => {
-      db.collection('users').doc(cred.user.uid).set({
-          email: email,
-          name: name
-      });
-    });
-  }
 
   logIn = (e) => {
     e.preventDefault();
     const loginForm = document.querySelector('#login-form');
     const email = loginForm['login-email'].value;
     const password = loginForm['login-password'].value;
-    // var form = new FormData(document.getElementById("logInForm"));
-    // var email = form.get("email");
-    // var password = form.get("password");
 
     auth.signInWithEmailAndPassword(email,password).then(cred => {
       const modal = document.querySelector('#modal-login');
@@ -103,17 +160,44 @@ class App extends React.Component {
 
 parseHoldings = () => {
   var DBholdings = this.state.DBholdings.docs;
+  var holdings = [];
   DBholdings.forEach(holdingDoc => {
-    console.log(holdingDoc.data())
+    //console.log(holdingDoc.data());
+    var owner = db.collection('users').doc(holdingDoc.data().owner.id);
+    holdings.push({
+      ownerID: owner.id,
+      price: holdingDoc.data().price,
+      quantity: holdingDoc.data().quantity,
+      securityID: holdingDoc.data().security.id
+    });
+  })
+  this.setState({
+    holdings: holdings
   })
 }
+
+parseSecurities = () => {
+  var DBsecurities = this.state.DBsecurities.docs;
+  var securities = [];
+  DBsecurities.forEach(securityDoc => {
+    securities.push({
+      TypeName: securityDoc.data().TypeName,
+      price: securityDoc.data().price,
+      type: securityDoc.data().type,
+      securityID: securityDoc.id,
+      previousClose: securityDoc.data().previousClose
+    })
+  })
+  this.setState({
+    securities: securities
+  })
+}
+
  
   componentDidMount() {
-
     db.collection('games').doc('VkKYxxa3IFsqpo30lXal').onSnapshot(game => {
         this.setState({
-          game: game.data(),
-          gameID: game.id
+          game: game
         });
     });
 
@@ -121,106 +205,61 @@ parseHoldings = () => {
     //auth changes
     auth.onAuthStateChanged(user => {
       if(user){
+        db.collection('users').get().then(users => {
+          this.setState({
+            allUsers: users.docs
+          })
+        })
         db.collection('users').doc(user.uid).get().then(doc => {
           this.setState({
             user: doc,
-            userLoggedIn: true
-          });
+            userLoggedIn: true,
+            whoseDataToShow: doc.id
+          })
         });
         db.collection('holdings').onSnapshot(holdings => {
           this.setState({
             DBholdings: holdings
           }, () => {
             this.parseHoldings();
-        });
+          });
+        })
+        var game = db.collection('games').doc('VkKYxxa3IFsqpo30lXal');
+        db.collection('securities').where('game','==',game).onSnapshot(securities => {
+          this.setState({
+            DBsecurities: securities
+          }, () => {
+            this.parseSecurities();
+          });
         })
       }else{
         this.setState({
           user: null,
           userLoggedIn: false,
+          whoseDataToShow: null,
+          allUsers: null,
+          securities: null,
+          holdings: null,
           DBholdings: null,
-          holdings: null
+          DBsecurities: null
         })
+
       }
     });
-
- 
   }
 
-  passTurn = () => {
-    var turnID = this.state.game.whoseTurn;
-    if(turnID === 6){
-      db.collection('games').doc(this.state.gameID).update({
-        whoseTurn: 1
-      })
-    }else{
-      db.collection('games').doc(this.state.gameID).update({
-        whoseTurn: turnID + 1
-      })
-    }
-  }
 
-  currentUsersTurn(){
-    if(this.state.userLoggedIn === true){
-      if(this.state.game.whoseTurn === this.state.user.data().type){
-        return true;
-      }else{
-        return false;
-      }
-    }else{
-      return false;
-    }
-  }
-
-  whoseTurn(){
-    if(this.state.userLoggedIn === true){
-      if(this.state.game.whoseTurn === this.state.user.data().type){
-        return (
-          <div>
-            <h1>Your turn</h1>
-            <h1>Whose turn: {this.state.game.whoseTurn}</h1>
-            <button onClick={this.passTurn}>Pass turn</button>
-          </div>
-        )
-      }else{
-        return (
-          <div>
-            <h1>Its is NOT your turn</h1>
-            <h1>Whose turn: {this.state.game.whoseTurn}</h1>
-            <button onClick={this.passTurn}>Pass turn</button>
-          </div>
-        )
-      }
-    }else{
-      return (
-        <div>
-          <p>You are not logged in</p>
-        </div>
-      )
-    }
-  }
 
 
 
   render(){
-    var holding = {
-      price: 100,
-      priceBought: 0,
-      quantity: 0,
-      key: 'W',
-      name: 'Wayfair',
-      previousClose: 99,
-      percentChange: 1,
-      changeType: 'percentChangeUp'
-    }
-    var whoseTurn = this.whoseTurn();
-    var cardClass = this.currentUsersTurn() ? 'card active' : 'card inactive'
+
 
     return (
       <div className="App">
-        <Nav user={this.state.user} userLoggedIn={this.state.userLoggedIn} loginSubmit={this.logIn} signUpSubmit={this.signUp} logOut={this.logOut} ></Nav>
-        {whoseTurn}
-        <Card holding={holding} cardClass={cardClass}></Card>
+        {/* <Nav user={this.state.user} userLoggedIn={this.state.userLoggedIn} loginSubmit={this.logIn} signUpSubmit={this.signUp} logOut={this.logOut} ></Nav> */}
+        {/* <OtherUsers currentUser={this.state.user} allUsers={this.state.allUsers}></OtherUsers> */}
+        <Deck user={this.state.user} whoseDataToShow={this.state.whoseDataToShow} holdings={this.state.holdings} securities={this.state.securities}></Deck>
       </div>
     );
 

@@ -36,9 +36,6 @@ class Nav extends React.Component {
                             <li className="logged-out">
                                 <button className="btn black darken-2 z-depth-0 modal-trigger" data-target="modal-login">Login</button>
                             </li>
-                            <li className="logged-out">
-                                <button className="btn black darken-2 z-depth-0 modal-trigger" data-target="modal-signup">Sign up</button>
-                            </li>
                         </ul>
                     </div>
                 </nav>
