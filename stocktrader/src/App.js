@@ -1,5 +1,4 @@
 import React from 'react';
-import Nav from './Nav';
 import M from 'materialize-css';
 import "firebase/auth";
 import "firebase/firestore";
@@ -253,13 +252,43 @@ parseSecurities = () => {
 
 
   render(){
+    var loginButton = this.state.user != null ? (
+      <button>Logout</button>
+    ) : (
+      <button>Login</button>
+    )
 
 
     return (
       <div className="App">
+        <div className="LeftMain">
+          <div className="OtherPlayers">
+              {/* <button>User</button>
+              <button>User</button>
+              <button>User</button>
+              <button>User</button>
+              <button>User</button>
+              <button>User</button> */}
+              <div>user</div>
+              <div>user</div>
+              <div>user</div>
+              <div>user</div>
+              <div>user</div>
+              <div>user</div>
+          </div>
+          <div className="mainView">
+            {loginButton}
+            <Deck user={this.state.user} whoseDataToShow={this.state.whoseDataToShow} holdings={this.state.holdings} securities={this.state.securities}></Deck>
+          </div>
+          <div className="news">
+            NEWS 
+          </div>
+        </div>
+        <div className="feed">
+          FEED
+        </div>
         {/* <Nav user={this.state.user} userLoggedIn={this.state.userLoggedIn} loginSubmit={this.logIn} signUpSubmit={this.signUp} logOut={this.logOut} ></Nav> */}
         {/* <OtherUsers currentUser={this.state.user} allUsers={this.state.allUsers}></OtherUsers> */}
-        <Deck user={this.state.user} whoseDataToShow={this.state.whoseDataToShow} holdings={this.state.holdings} securities={this.state.securities}></Deck>
       </div>
     );
 

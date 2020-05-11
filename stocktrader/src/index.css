@@ -128,4 +128,65 @@ body{
 }
 
 
+.LeftMain .OtherPlayers{
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 80vw;
+  height: 15vh;
+  z-index: 1;
+}
 
+.LeftMain .OtherPlayers div{
+  width: 16.66%;
+  height: 100%;
+  float: left;
+  background-color: black;
+  color: white;
+  border-style: solid;
+  border-color: white;
+}
+
+.LeftMain{
+  padding-left: 0px;
+  margin-top: 15vh;
+  margin-right: 20%;
+  overflow: scroll;
+
+
+}
+
+.mainView{
+  padding: 0;
+  height: 60vh;
+  overflow: scroll;
+}
+
+
+.feed {
+  height: 100%;
+  width: 20%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color:yellow;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.news {
+  height: 25vh;
+  width: 80vw;
+  position: fixed;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  background-color:white;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.last{
+  clear: both
+}
