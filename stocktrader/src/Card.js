@@ -39,7 +39,7 @@ class Card extends React.Component {
 
         return(
            <div className={this.props.cardClass}>
-               <h1 className="companyName noSelect">{this.props.holding.name} ({this.props.holding.key})</h1>
+               <h1 className="companyName noSelect">{this.props.holding.name}</h1>
                <h1 className="currentPrice noSelect">${price} <span className={this.props.holding.changeType}>({this.props.holding.percentChange}%)</span></h1>
                <h6 className="overall noSelect">Purchase: {quantity} @ ${priceBought} (${purchaseValue})</h6>
                <h6 className="overall noSelect">Value:<span className={valueChangeClass}> ${value} (${valueChange})</span></h6>

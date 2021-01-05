@@ -138,13 +138,33 @@ body{
 }
 
 .LeftMain .OtherPlayers div{
-  width: 16.66%;
   height: 100%;
   float: left;
   background-color: black;
   color: white;
   border-style: solid;
   border-color: white;
+}
+
+
+.LeftMain .OtherPlayers div:nth-last-child(6):first-child, .LeftMain .OtherPlayers div:nth-last-child(6):first-child ~ div {
+  width: 16.66%;
+}
+
+.LeftMain .OtherPlayers div:nth-last-child(5):first-child, .LeftMain .OtherPlayers div:nth-last-child(5):first-child ~ div {
+  width: 20%;
+}
+
+.LeftMain .OtherPlayers div:nth-last-child(4):first-child, .LeftMain .OtherPlayers div:nth-last-child(4):first-child ~ div {
+  width: 25%;
+}
+
+.LeftMain .OtherPlayers div:nth-last-child(3):first-child, .LeftMain .OtherPlayers div:nth-last-child(3):first-child ~ div {
+  width: 33.33%;
+}
+
+.LeftMain .OtherPlayers div:nth-last-child(2):first-child, .LeftMain .OtherPlayers div:nth-last-child(2):first-child ~ div {
+  width: 50%;
 }
 
 .LeftMain{
